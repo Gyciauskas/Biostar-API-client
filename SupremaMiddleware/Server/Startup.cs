@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SupremaMiddleware.Server.AccessTokenManagement;
 using System;
 
 namespace SupremaMiddleware.Server
@@ -23,7 +24,10 @@ namespace SupremaMiddleware.Server
 
             services.Configure<User>(Configuration.GetSection(nameof(User)));
 
-            services.AddAccessTokenManagement(c =>
+            services.AddAccessTokenManagement(new ClientTokenRequestParameters {
+                TokenRequestUri = "/api/login",
+                AuthorizationHeaderName = "bs-session-id"
+            }, c =>
             {
                 c.BaseAddress = biostarUrl;
             });

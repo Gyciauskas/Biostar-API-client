@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using SupremaMiddleware.Server.AccessTokenManagement;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,10 +9,13 @@ namespace SupremaMiddleware.Server
     public class ClientAccessTokenHandler : DelegatingHandler
     {
         private readonly IClientAccessTokenManagementService _accessTokenManagementService;
+        private readonly ClientTokenRequestParameters _tokenRequestParameters;
 
-        public ClientAccessTokenHandler(IClientAccessTokenManagementService accessTokenManagementService)
+        public ClientAccessTokenHandler(IClientAccessTokenManagementService accessTokenManagementService,
+            ClientTokenRequestParameters tokenRequestParameters)
         {
             _accessTokenManagementService = accessTokenManagementService;
+            _tokenRequestParameters = tokenRequestParameters;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -20,7 +25,7 @@ namespace SupremaMiddleware.Server
             var response = await base.SendAsync(request, cancellationToken);
 
             // retry if 401
-            if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized)
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
             {
                 response.Dispose();
 
@@ -36,7 +41,7 @@ namespace SupremaMiddleware.Server
         {
             var accessToken = await _accessTokenManagementService.GetClientAccessTokenAsync(forceRenewal);
 
-            request.Headers.Add("bs-session-id", accessToken);
+            request.Headers.Add(_tokenRequestParameters.AuthorizationHeaderName, accessToken);
         }
     }
 }

@@ -14,22 +14,25 @@ namespace SupremaMiddleware.Server
 {
     public class ClientAccessTokenManagementService : IClientAccessTokenManagementService
     {
-        private const string BsSessionId = "bsSessionId";
+        private const string ClientAccessToken = "clientAccessToken";
 
         private readonly IHttpClientFactory _clientFactory;
         private readonly IMemoryCache _cache;
         private readonly User _user;
-        private readonly ILogger<ClientAccessTokenManagementService> _logger;       
+        private readonly ILogger<ClientAccessTokenManagementService> _logger;
+        private readonly ClientTokenRequestParameters _tokenRequestParameters;      
 
         public ClientAccessTokenManagementService(IHttpClientFactory clientFactory,
             IMemoryCache distributedCache,
             IOptions<User> user,
-            ILogger<ClientAccessTokenManagementService> logger)
+            ILogger<ClientAccessTokenManagementService> logger,
+            ClientTokenRequestParameters tokenRequestParameters)
         {
             _clientFactory = clientFactory;
             _cache = distributedCache;
             _user = user.Value;
             _logger = logger;
+            _tokenRequestParameters = tokenRequestParameters;
         }       
 
         public async Task<string> GetClientAccessTokenAsync(bool forceRenewal = false)
@@ -40,14 +43,14 @@ namespace SupremaMiddleware.Server
 
                 var token = await RequestClientAccessTokenAsync();
 
-                _cache.Remove(BsSessionId);
+                _cache.Remove(ClientAccessToken);
 
-                _cache.Set(BsSessionId, token);
+                _cache.Set(ClientAccessToken, token);
 
                 return token;
             }
 
-            var cachedToken = _cache.Get<string>(BsSessionId);
+            var cachedToken = _cache.Get<string>(ClientAccessToken);
 
             if (string.IsNullOrEmpty(cachedToken))
             {
@@ -55,7 +58,7 @@ namespace SupremaMiddleware.Server
 
                 var token = await RequestClientAccessTokenAsync();
 
-                _cache.Set(BsSessionId, token);
+                _cache.Set(ClientAccessToken, token);
 
                 return token;
             }
@@ -69,7 +72,7 @@ namespace SupremaMiddleware.Server
         {
             var json = JsonSerializer.Serialize(_user);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/login");
+            var request = new HttpRequestMessage(HttpMethod.Post, _tokenRequestParameters.TokenRequestUri);
 
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -81,7 +84,7 @@ namespace SupremaMiddleware.Server
             {
                 _logger.LogInformation("access token received");
 
-                var accessToken = response.Headers.GetValues("bs-session-id").First();
+                var accessToken = response.Headers.GetValues(_tokenRequestParameters.AuthorizationHeaderName).First();
 
                 return accessToken;
             }

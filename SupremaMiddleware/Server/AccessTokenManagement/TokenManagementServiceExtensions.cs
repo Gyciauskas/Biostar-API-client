@@ -12,12 +12,15 @@ namespace SupremaMiddleware.Server
         /// Adds the token management services to DI
         /// </summary>
         public static void AddAccessTokenManagement(this IServiceCollection services,
+            ClientTokenRequestParameters tokenRequestParameters,
             Action<HttpClient> configureClient = null)
         {
             if (configureClient != null)
             {
                 services.AddHttpClient(AccessTokenManagementDefaults.DefaultTokenClientName, configureClient);
             }
+
+            services.AddSingleton(tokenRequestParameters);
 
             services.AddMemoryCache();
 

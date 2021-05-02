@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using SupremaMiddleware.Server.AccessTokenManagement;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -36,6 +36,8 @@ namespace SupremaMiddleware.Server
         {
             if (forceRenewal)
             {
+                _logger.LogInformation("Requested new access token");
+
                 var token = await RequestClientAccessTokenAsync();
 
                 _cache.Remove(BsSessionId);
@@ -71,7 +73,7 @@ namespace SupremaMiddleware.Server
 
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var httpClient = _clientFactory.CreateClient("TokenService");
+            var httpClient = _clientFactory.CreateClient(AccessTokenManagementDefaults.DefaultTokenClientName);
 
             var response = await httpClient.SendAsync(request);
 

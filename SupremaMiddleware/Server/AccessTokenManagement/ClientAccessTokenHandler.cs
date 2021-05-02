@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,7 +34,7 @@ namespace SupremaMiddleware.Server
 
         public async Task SetAccessTokenAsync(HttpRequestMessage request, bool forceRenewal = false)
         {
-            var accessToken = await _accessTokenManagementService.GetClientAccessTokenAsync();
+            var accessToken = await _accessTokenManagementService.GetClientAccessTokenAsync(forceRenewal);
 
             request.Headers.Add("bs-session-id", accessToken);
         }

@@ -15,20 +15,20 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>User Id</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var forecast in forecasts)
             {
                 <tr>
+                    <td>@forecast.user_id</td>
                     <td>@forecast.name</td>
                     <td>@forecast.email</td>
                     <td>@forecast.phone</td>
-                    <td>@forecast.user_id</td>
                 </tr>
             }
         </tbody>

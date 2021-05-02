@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SupremaMiddleware.Server.AccessTokenManagement;
 using System;
 using System.Net.Http;
 
@@ -15,7 +16,7 @@ namespace SupremaMiddleware.Server
         {
             if (configureClient != null)
             {
-                services.AddHttpClient("TokenService", configureClient);
+                services.AddHttpClient(AccessTokenManagementDefaults.DefaultTokenClientName, configureClient);
             }
 
             services.AddMemoryCache();

@@ -24,7 +24,7 @@ namespace SupremaMiddleware.Server
 
             services.AddMemoryCache();
 
-            services.TryAddTransient<IClientAccessTokenManagementService, ClientAccessTokenManagementService>();
+            services.TryAddTransient<IClientAccessTokenManagementService, JwtTokenManagementService>();
 
             // The DelegatingHandler has to be registered as a Transient Service
             services.TryAddTransient<ClientAccessTokenHandler>();

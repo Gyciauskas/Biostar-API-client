@@ -58,14 +58,12 @@ namespace SupremaMiddleware.Server.AccessTokenManagement
 
                 _cache.Set(JwtToken, jwtToken);
 
-                return jwtToken.;
+                return "";
             }
             else
             {
-                return Task.FromResult(cachedToken);
+                return "";
             }
-
-            return Task.FromResult("");
         }
 
         private Task<SecurityToken> RequestClientAccessTokenAsync()
